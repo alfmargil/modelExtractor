@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 from selenium import webdriver
+
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
@@ -23,6 +24,8 @@ def extraer_datos_por_marca(url_inicial, clase_objetivo):
     try:
         # Configuración del servicio de Chromedriver
         service = Service('./chromedriver')  # Ruta al Chromedriver local
+        chrome_options = webdriver.ChromeOptions()
+        chrome_options.add_argument('--no-sandbox')  # Opcional, si es necesario deshabilitar el sandbox
 
         # Inicializar el driver usando el servicio configurado
         driver = webdriver.Chrome(service=service)
