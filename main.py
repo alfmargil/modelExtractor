@@ -8,70 +8,88 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup
 import time
+import random
+import re
 
-def extraer_datos_por_marca(url_inicial, clase_objetivo, nombre_archivo):
+def extraer_datos_por_marca(url_inicial, clase_objetivo):
     """
-    Extrae datos de una URL inicial, seleccionando diferentes opciones de marca y guarda los datos en un archivo .txt
+    Extrae datos de una URL inicial, seleccionando diferentes opciones de marca y guarda los datos en un archivo .txt.
+    El nombre del archivo es el contenido del h1 de la web scrapeada.
 
     Args:
       url_inicial (str): La URL de la página web inicial.
       clase_objetivo (str): La clase CSS que se quiere buscar después de la selección de marca.
-      nombre_archivo (str): El nombre del archivo .txt donde se guardarán los datos.
     """
-    # Configuración del servicio de Chromedriver
-    service = Service('/home/alfonso/Descargas/chromedriver-linux64/chromedriver')  # Cambia a la ubicación real de tu chromedriver
-    driver = webdriver.Chrome(service=service)
+    try:
+        # Configuración del servicio de Chromedriver
+        service = Service('./chromedriver')  # Ruta al Chromedriver local
 
-    driver.get(url_inicial)
+        # Inicializar el driver usando el servicio configurado
+        driver = webdriver.Chrome(service=service)
 
-    # Espera explícita para cargar la página completamente (ajusta el tiempo según sea necesario)
-    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "product-fits__brand")))
+        driver.get(url_inicial)
 
-    # Seleccionar el desplegable de marcas
-    select_element = Select(driver.find_element(By.CLASS_NAME, "product-fits__brand"))
+        # Espera explícita para cargar la página completamente (ajusta el tiempo según sea necesario)
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "h1")))
 
-    # Obtener todas las opciones del desplegable
-    options = select_element.options
+        # Extraer el contenido del h1
+        h1_element = driver.find_element(By.TAG_NAME, "h1")
+        h1_text = h1_element.text.strip()
 
-    # Iterar sobre cada opción del desplegable (excepto la primera opción vacía)
-    for option in options[1:]:
-        # Obtener el valor y texto de la opción
-        option_value = option.get_attribute("value")
-        option_text = option.text
+        # Limpiar el texto del h1 para que sea un nombre de archivo válido
+        nombre_archivo = re.sub(r'[^A-Za-z0-9 ]+', '', h1_text) + '.txt'
 
-        # Seleccionar la opción en el desplegable
-        select_element.select_by_value(option_value)
+        # Espera explícita para cargar la página completamente (ajusta el tiempo según sea necesario)
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "product-fits__brand")))
 
-        # Esperar un tiempo suficiente para que se cargue el contenido dinámico
-        time.sleep(2)  # Ajusta según sea necesario
+        # Seleccionar el desplegable de marcas
+        select_element = Select(driver.find_element(By.CLASS_NAME, "product-fits__brand"))
 
-        # Extraer HTML después de la selección
-        contenido_html = driver.page_source
+        # Obtener todas las opciones del desplegable
+        options = select_element.options
 
-        # Analizar el código HTML con BeautifulSoup
-        sopa = BeautifulSoup(contenido_html, 'html.parser')
+        # Iterar sobre cada opción del desplegable (excepto la primera opción vacía)
+        for option in options[1:]:
+            # Obtener el valor y texto de la opción
+            option_value = option.get_attribute("value")
+            option_text = option.text
 
-        # Encuentra todos los elementos con la clase objetivo
-        elementos = sopa.find_all('div', class_=clase_objetivo)
+            # Seleccionar la opción en el desplegable
+            select_element.select_by_value(option_value)
 
-        # Lista para almacenar todos los valores de data-checkid con la marca
-        data_checkids_con_marca = []
+            # Esperar un tiempo suficiente para que se cargue el contenido dinámico
+            time.sleep(random.uniform(5, 8))  # Ajusta según sea necesario
 
-        for elemento in elementos:
-            if elemento.has_attr('data-checkid'):
-                data_checkid_valor = elemento['data-checkid']
-                # Agregar el nombre de la marca antes del valor de data-checkid
-                data_checkids_con_marca.append(f"{option_text.strip()} {data_checkid_valor}")
+            # Extraer HTML después de la selección
+            contenido_html = driver.page_source
 
-        # Abre el archivo .txt en modo escritura
-        with open(nombre_archivo, 'a', encoding='utf-8') as archivo:  # 'a' para añadir al archivo
-            # Escribe cada valor de data-checkid con la marca en el archivo
-            for valor in data_checkids_con_marca:
-                archivo.write(valor + '\n')
+            # Analizar el código HTML con BeautifulSoup
+            sopa = BeautifulSoup(contenido_html, 'html.parser')
 
-    # Cierra el navegador al finalizar
-    driver.quit()
-    messagebox.showinfo("Completado", "Extracción de datos finalizada.")
+            # Encuentra todos los elementos con la clase objetivo
+            elementos = sopa.find_all('div', class_=clase_objetivo)
+
+            # Lista para almacenar todos los valores de data-checkid con la marca
+            data_checkids_con_marca = []
+
+            for elemento in elementos:
+                if elemento.has_attr('data-checkid'):
+                    data_checkid_valor = elemento['data-checkid']
+                    # Agregar el nombre de la marca antes del valor de data-checkid
+                    data_checkids_con_marca.append(f"{option_text.strip()} {data_checkid_valor}")
+
+            # Abre el archivo .txt en modo escritura
+            with open(nombre_archivo, 'a', encoding='utf-8') as archivo:  # 'a' para añadir al archivo
+                # Escribe cada valor de data-checkid con la marca en el archivo
+                for valor in data_checkids_con_marca:
+                    archivo.write(valor + '\n')
+
+        # Cierra el navegador al finalizar
+        driver.quit()
+        messagebox.showinfo("Completado", f"Extracción de datos finalizada. Datos guardados en {nombre_archivo}")
+
+    except Exception as e:
+        messagebox.showerror("Error", f"Ocurrió un error: {str(e)}")
 
 def generar_datos():
     url = url_entry.get().strip()
@@ -81,9 +99,8 @@ def generar_datos():
 
     url_inicial = url
     clase_objetivo = 'product-fits__item'
-    nombre_archivo = 'data_checkids.txt'
 
-    extraer_datos_por_marca(url_inicial, clase_objetivo, nombre_archivo)
+    extraer_datos_por_marca(url_inicial, clase_objetivo)
 
 # Crear ventana Tkinter
 root = tk.Tk()
