@@ -1,12 +1,12 @@
 import tkinter as tk
 from tkinter import messagebox
 from selenium import webdriver
-
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
 import time
 import random
@@ -28,7 +28,7 @@ def extraer_datos_por_marca(url_inicial, clase_objetivo):
         chrome_options.add_argument('--no-sandbox')  # Opcional, si es necesario deshabilitar el sandbox
 
         # Inicializar el driver usando el servicio configurado
-        driver = webdriver.Chrome(service=service)
+        driver = webdriver.Chrome(service=service, options=chrome_options)
 
         driver.get(url_inicial)
 
@@ -42,17 +42,14 @@ def extraer_datos_por_marca(url_inicial, clase_objetivo):
         # Limpiar el texto del h1 para que sea un nombre de archivo válido
         nombre_archivo = re.sub(r'[^A-Za-z0-9 ]+', '', h1_text) + '.txt'
 
-        # Espera explícita para cargar la página completamente (ajusta el tiempo según sea necesario)
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, "product-fits__brand")))
-
         # Seleccionar el desplegable de marcas
         select_element = Select(driver.find_element(By.CLASS_NAME, "product-fits__brand"))
-
+        
         # Obtener todas las opciones del desplegable
         options = select_element.options
 
-        # Iterar sobre cada opción del desplegable (excepto la primera opción vacía)
-        for option in options[1:]:
+        # Iterar sobre cada opción del desplegable
+        for option in options:
             # Obtener el valor y texto de la opción
             option_value = option.get_attribute("value")
             option_text = option.text
@@ -60,8 +57,14 @@ def extraer_datos_por_marca(url_inicial, clase_objetivo):
             # Seleccionar la opción en el desplegable
             select_element.select_by_value(option_value)
 
+            campo_busqueda = driver.find_element(By.CSS_SELECTOR, ".product-fits__search")
+            ActionChains(driver).move_to_element(campo_busqueda).click().perform()
+
+            # Seleccionar la opción en el desplegable
+            #select_element.select_by_value(option_value)
+
             # Esperar un tiempo suficiente para que se cargue el contenido dinámico
-            time.sleep(random.uniform(5, 8))  # Ajusta según sea necesario
+            time.sleep(random.uniform(4, 6))  # Ajusta según sea necesario
 
             # Extraer HTML después de la selección
             contenido_html = driver.page_source
