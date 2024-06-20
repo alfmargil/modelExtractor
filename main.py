@@ -60,11 +60,8 @@ def extraer_datos_por_marca(url_inicial, clase_objetivo):
             campo_busqueda = driver.find_element(By.CSS_SELECTOR, ".product-fits__search")
             ActionChains(driver).move_to_element(campo_busqueda).click().perform()
 
-            # Seleccionar la opción en el desplegable
-            #select_element.select_by_value(option_value)
-
             # Esperar un tiempo suficiente para que se cargue el contenido dinámico
-            time.sleep(random.uniform(4, 6))  # Ajusta según sea necesario
+            #time.sleep(random.uniform(4, 6))  # Ajusta según sea necesario
 
             # Extraer HTML después de la selección
             contenido_html = driver.page_source
