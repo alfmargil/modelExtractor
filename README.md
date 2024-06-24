@@ -1,7 +1,6 @@
-# modelExtractor
-# Extracción de Datos con Selenium y Tkinter
+# Extracción de Datos con Selenium
 
-Esta aplicación permite extraer datos de una página web específica, seleccionando diferentes opciones de un desplegable y guardando los resultados en un archivo de texto. Utiliza Selenium para automatizar la navegación web y BeautifulSoup para analizar el contenido HTML.
+Esta aplicación permite extraer datos de una página web específica, seleccionando diferentes opciones de un desplegable y guardando los resultados en un archivo de texto. Utiliza Selenium para automatizar la navegación web, BeautifulSoup para analizar el contenido HTML y Tinker para la sencilla interfaz gráfica
 
 ## Uso
 
@@ -40,4 +39,5 @@ Al ejecutar la aplicación y proporcionar la URL, el script seleccionará cada o
 ```python
 # Ejemplo de uso de la función principal
 extraer_datos_por_marca("https://ejemplo.com", "clase-objetivo")
+
 
