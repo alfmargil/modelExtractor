@@ -98,6 +98,7 @@ def extraer_datos_por_marca(url_inicial, clase_objetivo):
 
         else:
             # Iterar sobre cada opción del desplegable
+            i = 0
             for option in options:
                 # Obtener el valor y texto de la opción
                 option_value = option.get_attribute("value")
@@ -106,12 +107,13 @@ def extraer_datos_por_marca(url_inicial, clase_objetivo):
                 select_element.select_by_value(option_value)
                 campo_busqueda = driver.find_element(By.CSS_SELECTOR, ".product-fits__search")
                 ActionChains(driver).move_to_element(campo_busqueda).click().perform()
-                WebDriverWait(driver, 3)
-
+                if(i!=0):
+                    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".product-fits__item")))
+                
         
                 # Extraer HTML después de la selección
                 contenido_html = driver.page_source
-
+                i+=1
                 # Analizar el código HTML con BeautifulSoup
                 sopa = BeautifulSoup(contenido_html, 'html.parser')
 
