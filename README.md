@@ -6,7 +6,7 @@ Esta aplicación permite extraer datos de una página web específica, seleccion
 
 1. **Clonar el repositorio o descargar el script**:
     ```sh
-    git clone <URL_DE_TU_REPOSITORIO>
+    git clone https://github.com/alfmargil/modelExtractor
     cd <NOMBRE_DEL_DIRECTORIO>
     ```
 
