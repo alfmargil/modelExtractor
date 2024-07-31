@@ -29,12 +29,13 @@ def extraer_datos_por_marca(url_inicial, clase_objetivo):
         chrome_options.add_argument('--disable-extensions')
         chrome_options.add_argument('--disable-popup-blocking')
         chrome_options.add_argument('--ignore-certificate-errors')
+        chrome_options.add_argument('--disable-search-engine-choice-screen')
 
         # Inicializar el driver usando el servicio configurado
         driver = webdriver.Chrome(service=service, options=chrome_options)
 
         driver.get(url_inicial)
-
+        driver.set_page_load_timeout(3)
         # Espera explícita para cargar la página completamente (ajusta el tiempo según sea necesario)
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "h1")))
 
