@@ -63,6 +63,9 @@ def extraer_datos_por_marca(url_inicial, clase_objetivo):
                 option_value = options[0].get_attribute("value")
                 option_text = options[0].text
 
+                # Transformar el texto de la marca
+                option_text = option_text.upper().replace(" ", "-")
+
                 # Seleccionar la opción en el desplegable
                 select_element.select_by_value(option_value)
 
@@ -104,6 +107,10 @@ def extraer_datos_por_marca(url_inicial, clase_objetivo):
                 # Obtener el valor y texto de la opción
                 option_value = option.get_attribute("value")
                 option_text = option.text
+
+                # Transformar el texto de la marca
+                option_text = option_text.upper().replace(" ", "-")
+
                 # Seleccionar la opción en el desplegable
                 select_element.select_by_value(option_value)
                 campo_busqueda = driver.find_element(By.CSS_SELECTOR, ".product-fits__search")
