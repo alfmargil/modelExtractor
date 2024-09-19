@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
+from webdriver_manager.chrome import ChromeDriverManager
 from bs4 import BeautifulSoup
 import time
 import random
@@ -37,12 +38,13 @@ def extraer_datos_por_marca(url_inicial, clase_objetivo):
         blacklist = cargar_blacklist('blacklist.txt')
 
         # Configuración del servicio de Chromedriver
-        service = Service('./chromedriver')  # Ruta al Chromedriver local
+        service = Service(ChromeDriverManager().install())
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument('--no-sandbox')  # Opcional, si es necesario deshabilitar el sandbox
         chrome_options.add_argument('--disable-extensions')
         chrome_options.add_argument('--disable-popup-blocking')
         chrome_options.add_argument('--ignore-certificate-errors')
+        #chrome_options.add_argument('--headless')
         chrome_options.add_argument('--disable-search-engine-choice-screen')
 
         # Inicializar el driver usando el servicio configurado
@@ -135,7 +137,7 @@ def extraer_datos_por_marca(url_inicial, clase_objetivo):
                 campo_busqueda = driver.find_element(By.CSS_SELECTOR, ".product-fits__search")
                 ActionChains(driver).move_to_element(campo_busqueda).click().perform()
                 if(i!=0):
-                    WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".product-fits__item")))
+                    WebDriverWait(driver, 200   ).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".product-fits__item")))
                 
         
                 # Extraer HTML después de la selección
