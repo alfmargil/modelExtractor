@@ -51,7 +51,7 @@ def extraer_datos_por_marca(url_inicial, clase_objetivo):
         driver = webdriver.Chrome(service=service, options=chrome_options)
 
         driver.get(url_inicial)
-        driver.set_page_load_timeout(3)
+        driver.set_page_load_timeout(5)
         # Espera explícita para cargar la página completamente (ajusta el tiempo según sea necesario)
         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "h1")))
 
@@ -60,7 +60,8 @@ def extraer_datos_por_marca(url_inicial, clase_objetivo):
             cookie_button.click()
         except:
             pass
-
+        
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".product-fits__brand")))
         # Extraer el contenido del h1
         h1_element = driver.find_element(By.TAG_NAME, "h1")
         h1_text = h1_element.text.strip()
@@ -99,21 +100,21 @@ def extraer_datos_por_marca(url_inicial, clase_objetivo):
                 # Encuentra todos los elementos con la clase objetivo
                 elementos = sopa.find_all('div', class_=clase_objetivo)
 
-                # Lista para almacenar todos los valores de data-checkid con la marca
-                data_checkids_con_marca = []
+                # Lista para almacenar modelos con la marca
+                modelos_con_marca = []
 
                 for elemento in elementos:
-                    if elemento.has_attr('data-checkid'):
-                        data_checkid_valor = elemento['data-checkid']
-                        # Agregar el nombre de la marca antes del valor de data-checkid
-                        data_checkids_con_marca.append(f"{option_text.strip()} {data_checkid_valor}")
+                    modelo_div = elemento.select_one('.product__form-appliance > div')
+                    if modelo_div:
+                        modelo_texto = modelo_div.get_text(strip=True)
+                        modelos_con_marca.append(f"{option_text.strip()} {modelo_texto}")
 
-                # Abre el archivo .txt en modo escritura
-                with open(nombre_archivo, 'a', encoding='utf-8') as archivo:  # 'a' para añadir al archivo
-                    # Escribe cada valor de data-checkid con la marca en el archivo
-                    for valor in data_checkids_con_marca:
+                # Guardar en archivo
+                with open(nombre_archivo, 'a', encoding='utf-8') as archivo:
+                    for valor in modelos_con_marca:
                         print(valor)
                         archivo.write(valor + '\n')
+
 
 
         else:
@@ -149,21 +150,21 @@ def extraer_datos_por_marca(url_inicial, clase_objetivo):
                 # Encuentra todos los elementos con la clase objetivo
                 elementos = sopa.find_all('div', class_=clase_objetivo)
 
-                # Lista para almacenar todos los valores de data-checkid con la marca
-                data_checkids_con_marca = []
+                # Lista para almacenar modelos con la marca
+                modelos_con_marca = []
 
                 for elemento in elementos:
-                    if elemento.has_attr('data-checkid'):
-                        data_checkid_valor = elemento['data-checkid']
-                        # Agregar el nombre de la marca antes del valor de data-checkid
-                        data_checkids_con_marca.append(f"{option_text.strip()} {data_checkid_valor}")
+                    modelo_div = elemento.select_one('.product__form-appliance > div')
+                    if modelo_div:
+                        modelo_texto = modelo_div.get_text(strip=True)
+                        modelos_con_marca.append(f"{option_text.strip()} {modelo_texto}")
 
-                # Abre el archivo .txt en modo escritura
-                with open(nombre_archivo, 'a', encoding='utf-8') as archivo:  # 'a' para añadir al archivo
-                    # Escribe cada valor de data-checkid con la marca en el archivo
-                    for valor in data_checkids_con_marca:
+                # Guardar en archivo
+                with open(nombre_archivo, 'a', encoding='utf-8') as archivo:
+                    for valor in modelos_con_marca:
                         print(valor)
                         archivo.write(valor + '\n')
+
 
         # Cierra el navegador al finalizar
         driver.quit()
